@@ -1,44 +1,70 @@
 package jsonrpc
 
 import (
+	"fmt"
+
 	"github.com/panyanyany/go-web3/jsonrpc/transport"
 )
 
 // Client is the jsonrpc client
 type Client struct {
-	transport transport.Transport
-	endpoints endpoints
+	Transport transport.Transport
+	Endpoints *Endpoints
 }
 
-type endpoints struct {
-	w *Web3
-	e *Eth
-	n *Net
-	d *Debug
+type IClient interface {
+	Call(method string, out interface{}, params ...interface{}) error
+	Close() error
 }
 
 // NewClient creates a new client
 func NewClient(addr string) (*Client, error) {
 	c := &Client{}
-	c.endpoints.w = &Web3{c}
-	c.endpoints.e = &Eth{c}
-	c.endpoints.n = &Net{c}
-	c.endpoints.d = &Debug{c}
+	c.Endpoints = new(Endpoints)
+	c.Endpoints.Web3Client = &Web3{c}
+	c.Endpoints.EthClient = &Eth{c}
+	c.Endpoints.Net = &Net{c}
+	c.Endpoints.Debug = &Debug{c}
 
 	t, err := transport.NewTransport(addr)
 	if err != nil {
 		return nil, err
 	}
-	c.transport = t
+	c.Transport = t
 	return c, nil
 }
 
 // Close closes the tranport
 func (c *Client) Close() error {
-	return c.transport.Close()
+	return c.Transport.Close()
 }
 
 // Call makes a jsonrpc call
-func (c *Client) Call(method string, out interface{}, params ...interface{}) error {
-	return c.transport.Call(method, out, params...)
+func (c *Client) Call(method string, out interface{}, params ...interface{}) (err error) {
+	err = c.Transport.Call(method, out, params...)
+	if err != nil {
+	    err = fmt.Errorf("Client.Transport.Call: %w", err)
+	    return
+	}
+	return
+}
+
+// EthClient returns the reference to the eth namespace
+func (c *Client) Eth() *Eth {
+	return c.Endpoints.EthClient
+}
+
+// Net returns the reference to the net namespace
+func (c *Client) Net() *Net {
+	return c.Endpoints.Net
+}
+
+// Web3Client returns the reference to the web3 namespace
+func (c *Client) Web3() *Web3 {
+	return c.Endpoints.Web3Client
+}
+
+// EthClient returns the reference to the eth namespace
+func (c *Client) Debug() *Debug {
+	return c.Endpoints.Debug
 }

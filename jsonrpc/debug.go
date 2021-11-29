@@ -6,11 +6,6 @@ type Debug struct {
 	c *Client
 }
 
-// Eth returns the reference to the eth namespace
-func (c *Client) Debug() *Debug {
-	return c.endpoints.d
-}
-
 type TransactionTrace struct {
 	Gas         uint64
 	ReturnValue string
