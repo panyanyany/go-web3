@@ -43,8 +43,8 @@ func (c *Client) Close() error {
 func (c *Client) Call(method string, out interface{}, params ...interface{}) (err error) {
 	err = c.Transport.Call(method, out, params...)
 	if err != nil {
-	    err = fmt.Errorf("Client.Transport.Call: %w", err)
-	    return
+		err = fmt.Errorf("Client.Transport.Call: %w", err)
+		return
 	}
 	return
 }
