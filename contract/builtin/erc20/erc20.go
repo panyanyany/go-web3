@@ -21,7 +21,7 @@ type ERC20 struct {
 }
 
 // NewERC20 creates a new instance of the contract at a specific address
-func NewERC20(addr web3.Address, provider *jsonrpc.IEth) *ERC20 {
+func NewERC20(addr web3.Address, provider jsonrpc.IEth) *ERC20 {
 	return &ERC20{c: contract.NewContract(addr, abiERC20, provider)}
 }
 
